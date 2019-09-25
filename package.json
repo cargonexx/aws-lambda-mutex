@@ -1,0 +1,38 @@
+{
+  "name": "aws-lambda-mutex",
+  "version": "0.5.0",
+  "description": "ensure only-once execution of lambda functions",
+  "main": "./lib/index.js",
+  "scripts": {
+    "build": "npm run build:clean && npm run build:lib",
+    "build:clean": "rimraf lib",
+    "build:lib": "tsc",
+    "prepublish": "npm run build"
+  },
+  "dependencies": {
+    "@types/aws-lambda": "^8.10.33",
+    "@types/node": "^12.7.7",
+    "axios": "^0.18.0"
+  },
+  "devDependencies": {
+    "aws-sdk": "^2.535.0",
+    "rimraf": "^2.6.2",
+    "typescript": "^3.6.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:cargonexx/aws-lambda-mutex.git"
+  },
+  "keywords": [
+    "dynamodb",
+    "distributed",
+    "lock",
+    "lambda",
+    "mutex"
+  ],
+  "contributors": [
+    "Jan Prieser"
+  ],
+  "license": "MIT",
+  "types": "./lib/index.d.ts"
+}

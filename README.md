@@ -1,5 +1,5 @@
 # aws-lambda-mutex
-ensure only-once execution of lambda functions
+This assures an idempotent execution of lambda functions which have side-effects and are sensitive to being invokes multiple times (which happens and cannot be avoided, see [1](https://forums.aws.amazon.com/thread.jspa?threadID=241313) and [2](https://docs.aws.amazon.com/lambda/latest/dg/API_Invoke.html))
 
 ## dynamodb table
 the cloudformation resource for the backing dynamodb table:

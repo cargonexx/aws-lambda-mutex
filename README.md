@@ -37,7 +37,7 @@ const lockClient = new MutexLockCLient({
 });
 
 
-module.exports.createBankfile = lockClient.wrapHandler(async (event, context) => {
+module.exports.myHandler = lockClient.wrapHandler(async (event, context) => {
   console.log(JSON.stringify(context, null, 2));
   return 'implement me';
 });

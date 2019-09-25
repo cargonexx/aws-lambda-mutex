@@ -1,5 +1,5 @@
 {
-  "name": "aws-lambda-mutex",
+  "name": "@cargonexx/aws-lambda-mutex",
   "version": "0.5.0",
   "description": "ensure only-once execution of lambda functions",
   "main": "./lib/index.js",

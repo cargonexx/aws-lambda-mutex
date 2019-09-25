@@ -25,9 +25,9 @@ make sure the tableNames match as well.
 
 ## example usage
 ```
-const { MutexLockCLient } = require('aws-lambda-mutex');
+const { MutexLockClient } = require('@cargonexx/aws-lambda-mutex');
 
-const lockClient = new MutexLockCLient({
+const lockClient = new MutexLockClient({
   dynamodbRegion: "eu-west-1",
   dynamodbTable: process.env.DYNAMODB_LOCK_TABLE,
   dynamodbPartitionKey: "id",

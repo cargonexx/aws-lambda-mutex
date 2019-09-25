@@ -14,13 +14,13 @@ export interface Config {
 type AsyncHandler<TEvent = any, TResult = any> = (
   event: TEvent,
   context: Context
-) =>  Promise<TResult | void>;
+) => Promise<TResult | void>;
 
 function isAsyncHandler(handler: Handler | AsyncHandler): handler is AsyncHandler {
   return types.isAsyncFunction(handler) || types.isPromise(handler);
 }
 
-export class MutexLockCLient {
+export class MutexLockClient {
   dynamodbRegion: string;
   dynamodbTable: string;
   dynamodbPartitionKey: string;

@@ -1,6 +1,6 @@
 {
   "name": "@cargonexx/aws-lambda-mutex",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "ensure only-once execution of lambda functions",
   "main": "./lib/index.js",
   "scripts": {
@@ -11,8 +11,7 @@
   },
   "dependencies": {
     "@types/aws-lambda": "^8.10.33",
-    "@types/node": "^12.7.7",
-    "axios": "^0.18.0"
+    "@types/node": "^12.7.7"
   },
   "devDependencies": {
     "aws-sdk": "^2.535.0",

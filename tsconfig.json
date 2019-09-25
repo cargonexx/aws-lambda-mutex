@@ -13,7 +13,8 @@
             "node"
         ],
         "sourceMap": true,
-        "esModuleInterop": true
+        "esModuleInterop": true,
+        "strict": true
     },
     "exclude": [
         "dist",

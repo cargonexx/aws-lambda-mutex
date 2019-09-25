@@ -1,5 +1,5 @@
 import { DynamoDB } from 'aws-sdk';
-import { Context, Callback } from 'aws-lambda';
+import { Context, Handler, Callback } from 'aws-lambda';
 export interface Config {
     dynamodbRegion?: string;
     dynamodbTable: string;
@@ -8,6 +8,7 @@ export interface Config {
     cleanupAfterSeconds?: number;
     silent?: boolean;
 }
+declare type AsyncHandler<TEvent = any, TResult = any> = (event: TEvent, context: Context) => Promise<TResult | void>;
 export declare class MutexLockCLient {
     dynamodbRegion: string;
     dynamodbTable: string;
@@ -19,7 +20,8 @@ export declare class MutexLockCLient {
     constructor(config: Config);
     isFree(context: Context): Promise<boolean>;
     getKey(context: Context): string;
-    wrapHandler(handler: any): (event: any, context: Context, callback: Callback<any>) => void;
+    wrapHandler<TEvent, TResult>(handler: Handler<TEvent, TResult> | AsyncHandler<TEvent, TResult>): (event: any, context: Context, callback: Callback<any>) => void;
     private wrapCallback;
     private wrapAsync;
 }
+export {};

@@ -14,7 +14,11 @@ export interface Config {
 type AsyncHandler<TEvent = any, TResult = any> = (
   event: TEvent,
   context: Context
-) => void | Promise<TResult>;
+) =>  Promise<TResult | void>;
+
+function isAsyncHandler(handler: Handler | AsyncHandler): handler is AsyncHandler {
+  return types.isAsyncFunction(handler) || types.isPromise(handler);
+}
 
 export class MutexLockCLient {
   dynamodbRegion: string;
@@ -63,17 +67,17 @@ export class MutexLockCLient {
     return [context.functionName, context.functionVersion, context.awsRequestId].join('-');
   }
 
-  public wrapHandler(handler) {
-    if (types.isAsyncFunction(handler) || types.isPromise(handler)) {
+  public wrapHandler<TEvent = any, TResult = any>(handler: Handler<TEvent, TResult> | AsyncHandler<TEvent, TResult>) {
+    if (isAsyncHandler(handler)) {
       return this.wrapAsync(handler);
     } else {
       return this.wrapCallback(handler);
     }
   }
 
-  private wrapCallback(handler: Handler) {
+  private wrapCallback<TEvent, TResult>(handler: Handler<TEvent, TResult>) {
     const self = this;
-    return (event: any, context: Context, callback: Callback) => {
+    return (event: TEvent, context: Context, callback: Callback<TResult | string>) => {
       self.isFree(context)
         .then(isFree => {
           if (isFree) {
@@ -93,9 +97,9 @@ export class MutexLockCLient {
   }
 
 
-  private wrapAsync(handler: AsyncHandler): AsyncHandler {
+  private wrapAsync<TEvent, TResult>(handler: AsyncHandler<TEvent, TResult>): AsyncHandler<TEvent, TResult | string> {
     const self = this;
-    return async (event: any = {}, context: Context): Promise<any> => {
+    return async (event: TEvent, context: Context): Promise<TResult | string | void> => {
       const neverRan = await self.isFree(context);
       if (neverRan) {
         return handler(event, context);

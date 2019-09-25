@@ -23,6 +23,7 @@
     "type": "git",
     "url": "git@github.com:cargonexx/aws-lambda-mutex.git"
   },
+  "publishConfig": { "registry": "https://npm.pkg.github.com/" },
   "keywords": [
     "dynamodb",
     "distributed",

@@ -7,6 +7,7 @@ export interface Config {
     dynamodbTtlKey: string;
     cleanupAfterSeconds?: number;
     silent?: boolean;
+    getKeyFn?: (event: any, context: Context) => string;
 }
 declare type AsyncHandler<TEvent = any, TResult = any> = (event: TEvent, context: Context) => Promise<TResult | void>;
 export declare class MutexLockClient {
@@ -17,9 +18,10 @@ export declare class MutexLockClient {
     cleanupAfterSeconds: number;
     silent: boolean;
     dynamodb: DynamoDB.DocumentClient;
+    getKeyFn: (event: any, context: Context) => string;
     constructor(config: Config);
-    isFree(context: Context): Promise<boolean>;
-    getKey(context: Context): string;
+    isFree<TEvent>(event: TEvent, context: Context): Promise<boolean>;
+    getKey<TEvent>(event: TEvent, context: Context): string;
     wrapHandler<TEvent = any, TResult = any>(handler: Handler<TEvent, TResult> | AsyncHandler<TEvent, TResult>): (event: TEvent, context: Context, callback: Callback<string | void | TResult>) => void;
     private wrapCallback;
     private wrapAsync;

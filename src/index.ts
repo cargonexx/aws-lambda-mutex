@@ -9,6 +9,7 @@ export interface Config {
   dynamodbTtlKey: string;
   cleanupAfterSeconds?: number;
   silent?: boolean;
+  getKeyFn?: (event: any, context: Context) => string;
 }
 
 type AsyncHandler<TEvent = any, TResult = any> = (
@@ -28,6 +29,7 @@ export class MutexLockClient {
   cleanupAfterSeconds: number;
   silent: boolean;
   dynamodb: DynamoDB.DocumentClient;
+  getKeyFn: (event: any, context: Context) => string;
 
   constructor(config: Config) {
     this.dynamodbRegion = config.dynamodbRegion || "us-east-1";
@@ -36,11 +38,12 @@ export class MutexLockClient {
     this.dynamodbTtlKey = config.dynamodbTtlKey || "ttl";
     this.cleanupAfterSeconds = config.cleanupAfterSeconds || 1200;
     this.silent = config.silent === undefined ? true : config.silent;
+    this.getKeyFn = config.getKeyFn ? config.getKeyFn : this.getKey;
 
     this.dynamodb = new DynamoDB.DocumentClient({ region: this.dynamodbRegion });
   }
 
-  public async isFree(context: Context) {
+  public async isFree<TEvent>(event: TEvent, context: Context) {
     const params: DynamoDB.DocumentClient.PutItemInput = {
       TableName: this.dynamodbTable,
       Item: {},
@@ -49,7 +52,7 @@ export class MutexLockClient {
         "#partitionKey": this.dynamodbPartitionKey
       }
     };
-    params.Item[this.dynamodbPartitionKey] = this.getKey(context);
+    params.Item[this.dynamodbPartitionKey] = this.getKeyFn(event, context);
     params.Item[this.dynamodbTtlKey] = ((new Date()).valueOf() / 1000) | 0 + this.cleanupAfterSeconds;
     try {
       await this.dynamodb.put(params).promise();
@@ -63,7 +66,7 @@ export class MutexLockClient {
     }
   }
 
-  getKey(context: Context) {
+  getKey<TEvent>(event: TEvent, context: Context): string {
     return [context.functionName, context.functionVersion, context.awsRequestId].join('-');
   }
 
@@ -78,7 +81,7 @@ export class MutexLockClient {
   private wrapCallback<TEvent, TResult>(handler: Handler<TEvent, TResult>) {
     const self = this;
     return (event: TEvent, context: Context, callback: Callback<TResult | string>) => {
-      self.isFree(context)
+      self.isFree(event, context)
         .then(isFree => {
           if (isFree) {
             handler(event, context, callback);
@@ -100,7 +103,7 @@ export class MutexLockClient {
   private wrapAsync<TEvent, TResult>(handler: AsyncHandler<TEvent, TResult>): AsyncHandler<TEvent, TResult | string> {
     const self = this;
     return async (event: TEvent, context: Context): Promise<TResult | string | void> => {
-      const neverRan = await self.isFree(context);
+      const neverRan = await self.isFree(event, context);
       if (neverRan) {
         return handler(event, context);
       }
